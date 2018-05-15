@@ -1,7 +1,0 @@
-# PostgreSQL
-# ------------------------------------------------------------------------------
-POSTGRES_HOST=postgres
-POSTGRES_PORT=5432
-POSTGRES_DB=dino_backend
-POSTGRES_USER=RgqfyKxiJHkrpDpvYqUPahZKyDyywwiJ
-POSTGRES_PASSWORD=z2s2Y4PGaZITX7G3WwMpxcVLnRFzxu9gERwsyYPV6BD3dvTvhxYp6xqQfxWpOYS2
