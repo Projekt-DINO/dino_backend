@@ -13,7 +13,7 @@ if __name__ == "__main__":
     )
 
     f = Feeder()
-    f.feed_route(json=r) # doesnt feed anything yet
+    f.feed_route(json=r)
     print(f.data_container.get('distance'))
     print(f.data_container.get('duration'))
     print(f.data_container.get('polyline'))
