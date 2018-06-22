@@ -1,6 +1,6 @@
 import boto3
 from generateID import ID
-import globals
+from globals import globals
 
 random_id = ID.generate_id()
 
@@ -10,14 +10,42 @@ dynamodb = boto3.resource('dynamodb',
     region_name = globals.AWS_REGION
     )
 
-table = dynamodb.Table('Routes')
+def putIntoRoutes():
 
-response = table.put_item(Item={
-    "routeID": str(random_id)
-    }
-)
+    table = dynamodb.Table('Routes')
 
-if response['ResponseMetadata']['HTTPStatusCode'] == 200:
-    print("success")
-else:
-    print("Failed")
+    response = table.put_item(Item={
+        "bbox": "",
+        "features": "",
+        "info": "",
+        "routeID": str(random_id),
+        "type": "FeatureCollection"
+        }
+    )
+
+    if response['ResponseMetadata']['HTTPStatusCode'] == 200:
+        print("Added route into table - successful")
+    else:
+        print("Failed to insert route into table")
+
+
+def putIntoDINOUsers():
+
+    table = dynamodb.Table('DINO_Users')
+
+    response = table.put_item(Item={
+        "firstname": "Alexander",
+        "lastname": "Teusz",
+        "email": "alexander.teusz@hhu.de",
+        "password": "ungehashtespasswort",
+        "userID": str(random_id),
+        "score": 400
+        }
+    )
+
+    if response['ResponseMetadata']['HTTPStatusCode'] == 200:
+        print("Added user into table - successful")
+    else:
+        print("Failed to insert user into table")
+
+putIntoDINOUsers()

@@ -1,5 +1,5 @@
 import boto3
-import globals
+from globals import globals
 
 dynamodb = boto3.resource('dynamodb',
     aws_access_key_id = globals.AWS_ACCESS_KEY,
@@ -7,8 +7,18 @@ dynamodb = boto3.resource('dynamodb',
     region_name = globals.AWS_REGION
     )
 
-table = dynamodb.Table('Routes')
 
-data = table.scan()
+def getRoutesTable():
 
-print(data)
+    table = dynamodb.Table('Routes')
+    return table.scan()
+
+print(getRoutesTable())
+
+
+def getUsersTable():
+
+    table = dynamodb.Table('DINO_Users')
+    return table.scan()
+
+print(getUsersTable())
