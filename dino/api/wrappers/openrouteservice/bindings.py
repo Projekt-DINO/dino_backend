@@ -6,6 +6,7 @@ from dino_backend.dino.api.wrappers.openrouteservice.route import *
 from dino_backend.dino.api.wrappers.openrouteservice.geocoding import *
 from dino_backend.dino.api.wrappers.openrouteservice.pois import *
 from dino_backend.dino.api.wrappers.openrouteservice.config import APIConfig
+from dino_backend.dino.api.wrappers.openrouteservice.longlat import Waypoint
 
 
 """
@@ -107,7 +108,7 @@ class OpenRouteServiceAPIWrapper(object):
     """
     def get_route(self, waypoints, profile: str, preference: str, units: str, language: str):
         if isinstance(waypoints, list):
-            waypoints = self.__piped_wps(waypoints)
+            waypoints = Waypoint.piped(waypoints)
 
         dct = {
             "coordinates": waypoints,
@@ -142,12 +143,14 @@ class OpenRouteServiceAPIWrapper(object):
         print(response)
         return response
 
+    """
     def get_points_of_interest(self, geometry, filters, request=None):
         poi = PointOfInterest(api_key=self.config.api_key, geometry=geometry, filters=filters, request=request)
         response = self.async_loop.run_until_complete(self.__send_request(url=poi.url, method="POST", json=poi.build_json()))
-        print(url)
+        # print(url)
         print(response)
         return response
+    """
         
     async def __send_request(self, url, method="GET", json=None):
         session = aiohttp.ClientSession(headers={'User-Agent': 'Mozilla/5.0'})
@@ -171,14 +174,6 @@ class OpenRouteServiceAPIWrapper(object):
             print(str(e))
         finally:
             await session.close()
-
-    def __piped_wps(self, waypoints: list):
-        return '|'.join(
-                    [','.join(
-                            [str(coord) for coord in longlat]
-                        )
-                        for longlat in waypoints]
-                    )
 
 
 class APIError(Exception):

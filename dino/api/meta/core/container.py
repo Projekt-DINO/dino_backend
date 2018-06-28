@@ -1,8 +1,11 @@
 import json
 import logging as log
 
+from pprint import pprint
+
 from dino_backend.dino.api.meta.core.entity import Entity
 from dino_backend.dino.api.meta.core.exception import PropertyNotFound
+from dino_backend.dino.api.meta.util import isempty
 
 
 class JSONContainer(object):
@@ -23,19 +26,52 @@ class JSONContainer(object):
     def __str__(self):
         return "%s(%s)" % (self.__class__.__name__, str(self.entity_hook))
 
+    def __repr__(self):
+        return str(self)
+
     def get(self, key):
         if hasattr(self.entity_hook, str(key)):
             return getattr(self.entity_hook, str(key))
         raise PropertyNotFound("Unknown property of entity \'{}\': \'{}\'.\n"
-                               "List of available properties for entitiy \'{}\': {}".format(str(self.entity_hook),
-                                                                                            key, self.entity_hook,
-                                                                                            self.entity_hook.get_entity_properties()))
+                               "List of available properties for entitiy \'{}\': "
+                               "{}".format(str(self.entity_hook), key, self.entity_hook, self.entity_hook.get_properties()))
 
-    def prettyprint(self):
-        self.entity_hook.prettyprint_json()
+    def serialize(self):
+        return json.dumps(self.entity_hook.json_dict)
 
-    def prettyprint_all(self):
-        self.entity_hook.prettyprint_all()
+    def pretty_print(self):
+        pprint(self.entity_hook.json_dict, indent=4)
+
+    def iter_json_items(self, _json):
+        if isinstance(_json, dict):
+            for k, v in _json.items():
+                if isinstance(v, dict):
+                    yield from self.iter_json_items(_json=v)
+                elif isinstance(v, list):
+                    yield from self.iter_json_items(_json=v)
+                else:
+                    yield k, v
+        elif isinstance(_json, list):
+            for d in _json:
+                yield from self.iter_json_items(_json=d)
+
+    def set_empty_values(self, new_value):
+        self.__set_empty_values(self.entity_hook.json_dict, new_value)
+
+    def __set_empty_values(self, iterable, new_val):
+        if isinstance(iterable, dict):
+            for k, v in iterable.items():
+                if isinstance(v, dict):
+                    self.__set_empty_values(iterable=v, new_val=new_val)
+                elif isinstance(v, list):
+                    self.__set_empty_values(iterable=v, new_val=new_val)
+                else:
+                    if isinstance(v, str):
+                        if isempty(v):
+                            iterable[k] = new_val
+        elif isinstance(iterable, list):
+            for l in iterable:
+                self.__set_empty_values(iterable=l, new_val=new_val)
 
     def __load_json(self, path=None, fileio=None):
         if path is not None:

@@ -1,3 +1,6 @@
+# This entire file is not used
+
+
 class PointOfInterest(object):
 
     # TODO: POI Category IDs

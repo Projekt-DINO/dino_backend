@@ -1,3 +1,5 @@
+from dino_backend.dino.api.wrappers.openrouteservice.longlat import Waypoint
+
 
 class GeocodeSearch(object):
 
@@ -9,8 +11,11 @@ class GeocodeSearch(object):
             "text": str(term),
         }
         if coords is not None:
-            self.parameters["focus.point.lon"] = coords[0]
-            self.parameters["focus.point.lat"] = coords[1]
+            if not isinstance(coords, Waypoint):
+                raise ValueError("Coords must be instance of Waypoint, got {}".format(type(coords)))
+            self.parameters["focus.point.lon"] = coords.longitude
+            self.parameters["focus.point.lat"] = coords.latitude
+
 
     def build_url(self):
         url = "https://api.openrouteservice.org/geocode/search?api_key={}&size={}&boundary.country={}".format(self.api_key, self.result_size, self.country)
@@ -24,9 +29,13 @@ class GeocodeSearchReverse(object):
         self.result_size = 10
         self.country = "DEU"
         self.api_key = api_key
+
+        if not isinstance(coords, Waypoint):
+            raise ValueError("Coords must be Waypoint or List, got {}".format(type(coords)))
+
         self.parameters = {
-            "point.lon": coords[0],
-            "point.lat": coords[1],
+            "point.lon": coords.longitude,
+            "point.lat": coords.latitude,
         }
 
     def build_url(self):

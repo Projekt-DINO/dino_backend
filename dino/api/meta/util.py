@@ -11,3 +11,7 @@ def is_dir(path: str):
 
 def upperfirst(string: str):
     return string[0].upper() + string[1:]
+
+
+def isempty(string: str):
+    return string is None or string == "" or len(string) == 0
