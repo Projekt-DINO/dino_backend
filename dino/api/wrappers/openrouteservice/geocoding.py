@@ -1,4 +1,4 @@
-from dino_backend.dino.api.wrappers.openrouteservice.longlat import Waypoint
+from dino.api.wrappers.openrouteservice.longlat import Waypoint
 
 
 class GeocodeSearch(object):

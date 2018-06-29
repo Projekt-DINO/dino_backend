@@ -1,8 +1,9 @@
 import json as _json
 
-from dino_backend.dino.api.meta.util import is_dir, is_file
-from dino_backend.dino.api.meta.core.container import JSONContainer
-from dino_backend.dino.api.meta.core.standards.entity_objects import *
+from dino.api.meta.util import is_dir, is_file
+from dino.api.meta.core.container import JSONContainer
+from dino.api.meta.core.standards.entity_objects import *
+from dino.database.dynamoDB.put_table_content import putIntoRoutes
 
 
 class Feeder(object):
@@ -43,7 +44,9 @@ class Feeder(object):
             self.data_path = path
         elif json is not None:
             self.json_object = json
-        self.__feed_data(entity=Route.__str__())
+        self.data_container = self.__read_json(entity=Route.__str__())
+        self.data_container.set_empty_values("null")
+        putIntoRoutes(self.data_container.serialize())
 
     """
     def feed_toilet(self, path=None):
@@ -66,10 +69,6 @@ class Feeder(object):
             self.data_path = path
         self.__feed_data(entity=None)
     """
-
-    def __feed_data(self, entity):
-        self.data_container = self.__read_json(entity)
-        #TODO: DynamoDB
 
     def __read_json(self, entity=None):
         if entity is None:

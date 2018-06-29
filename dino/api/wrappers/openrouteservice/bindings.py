@@ -2,11 +2,11 @@ import asyncio
 import aiohttp
 import json
 
-from dino_backend.dino.api.wrappers.openrouteservice.route import *
-from dino_backend.dino.api.wrappers.openrouteservice.geocoding import *
-from dino_backend.dino.api.wrappers.openrouteservice.pois import *
-from dino_backend.dino.api.wrappers.openrouteservice.config import APIConfig
-from dino_backend.dino.api.wrappers.openrouteservice.longlat import Waypoint
+from dino.api.wrappers.openrouteservice.route import *
+from dino.api.wrappers.openrouteservice.geocoding import *
+from dino.api.wrappers.openrouteservice.pois import *
+from dino.api.wrappers.openrouteservice.config import APIConfig
+from dino.api.wrappers.openrouteservice.longlat import Waypoint
 
 
 """

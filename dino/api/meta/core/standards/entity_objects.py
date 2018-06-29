@@ -1,4 +1,4 @@
-from dino_backend.dino.api.meta.core.entity import Entity
+from dino.api.meta.core.entity import Entity
 
 
 class Route(Entity):
