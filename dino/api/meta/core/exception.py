@@ -1,0 +1,2 @@
+class PropertyNotFound(Exception):
+    pass
