@@ -73,6 +73,10 @@ class JSONContainer(object):
             for l in iterable:
                 self.__set_empty_values(iterable=l, new_val=new_val)
 
+    def get_as_entity_labeled_dict(self):
+        new_dct = {str(self.entity_hook.entity).lower(): self.entity_hook.json_dict}
+        return new_dct
+
     def __load_json(self, path=None, fileio=None):
         if path is not None:
             with open(path, 'r', encoding='latin-1') as dat:
