@@ -1,5 +1,5 @@
 import boto3
-from globals import globals
+from dino.database.dynamoDB.globals import globals
 
 dynamodb = boto3.resource('dynamodb',
     aws_access_key_id = globals.AWS_ACCESS_KEY,

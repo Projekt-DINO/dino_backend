@@ -1,6 +1,7 @@
 import boto3
-from generateID import ID
-from globals import globals
+from dino.database.dynamoDB.generateID import ID
+from dino.database.dynamoDB.globals import globals
+import json
 
 dynamodb = boto3.resource('dynamodb',
     aws_access_key_id = globals.AWS_ACCESS_KEY,
@@ -8,14 +9,14 @@ dynamodb = boto3.resource('dynamodb',
     region_name = globals.AWS_REGION
     )
 
-def putIntoRoutes():
+def putIntoRoutes(jsonRoute):
 
     random_id = ID.generate_id()
 
     table = dynamodb.Table('Routes')
 
-    response = table.put_item(Item={
-        "route": "",
+    response = table.put_item(Item= {
+        "route": jsonRoute,
         "routeID": str(random_id)
         }
     )
@@ -26,8 +27,6 @@ def putIntoRoutes():
         print("Failed to insert route into table")
 
     return random_id
-
-
 
 
 def putIntoDINOUsers():
