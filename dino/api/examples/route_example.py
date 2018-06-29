@@ -17,6 +17,8 @@ if __name__ == "__main__":
     f = Feeder()
     f.feed_route(json=r)
     f.data_container.set_empty_values("null")
+    print(f.data_container)
+    print(f.data_container.get_as_entity_labeled_dict())
     print(f.data_container.get('distance'))
     print(f.data_container.get('duration'))
     print(f.data_container.get('polyline'))
