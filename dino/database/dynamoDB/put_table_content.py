@@ -2,8 +2,6 @@ import boto3
 from generateID import ID
 from globals import globals
 
-random_id = ID.generate_id()
-
 dynamodb = boto3.resource('dynamodb',
     aws_access_key_id = globals.AWS_ACCESS_KEY,
     aws_secret_access_key = globals.AWS_SECRET_ACCESS_KEY,
@@ -12,14 +10,13 @@ dynamodb = boto3.resource('dynamodb',
 
 def putIntoRoutes():
 
+    random_id = ID.generate_id()
+
     table = dynamodb.Table('Routes')
 
     response = table.put_item(Item={
-        "bbox": "",
-        "features": "",
-        "info": "",
-        "routeID": str(random_id),
-        "type": "FeatureCollection"
+        "route": "",
+        "routeID": str(random_id)
         }
     )
 
@@ -28,8 +25,14 @@ def putIntoRoutes():
     else:
         print("Failed to insert route into table")
 
+    return random_id
+
+
+
 
 def putIntoDINOUsers():
+
+    random_id = ID.generate_id()
 
     table = dynamodb.Table('DINO_Users')
 
@@ -48,4 +51,3 @@ def putIntoDINOUsers():
     else:
         print("Failed to insert user into table")
 
-putIntoDINOUsers()
