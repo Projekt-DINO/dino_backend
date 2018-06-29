@@ -1,7 +1,7 @@
-from dino_backend.dino.api.meta.feeder import Feeder
-from dino_backend.dino.api.wrappers.openrouteservice.bindings import OpenRouteServiceAPIWrapper
-from dino_backend.dino.api.wrappers.openrouteservice.route import Profiles, Units, Preferences, Languages
-from dino_backend.dino.api.wrappers.openrouteservice.longlat import Waypoint
+from dino.api.meta.feeder import Feeder
+from dino.api.wrappers.openrouteservice.bindings import OpenRouteServiceAPIWrapper
+from dino.api.wrappers.openrouteservice.route import Profiles, Units, Preferences, Languages
+from dino.api.wrappers.openrouteservice.longlat import Waypoint
 
 
 if __name__ == "__main__":

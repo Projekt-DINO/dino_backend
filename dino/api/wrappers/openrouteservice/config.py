@@ -5,9 +5,9 @@ import json
 class APIConfig(object):
 
     def __init__(self):
-        self.path = os.path.dirname(os.path.realpath(__file__))+'\settings.cfg'
+        self.path = os.path.dirname(os.path.realpath(__file__))+'/settings.cfg'
         self.config = self.get_config()
-
+        print(self.path)
     def __getattr__(self, attr):
         attr = str(attr)
         if attr not in self.config:

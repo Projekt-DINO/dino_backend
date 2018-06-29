@@ -3,9 +3,9 @@ import logging as log
 
 from pprint import pprint
 
-from dino_backend.dino.api.meta.core.entity import Entity
-from dino_backend.dino.api.meta.core.exception import PropertyNotFound
-from dino_backend.dino.api.meta.util import isempty
+from dino.api.meta.core.entity import Entity
+from dino.api.meta.core.exception import PropertyNotFound
+from dino.api.meta.util import isempty
 
 
 class JSONContainer(object):
@@ -73,9 +73,6 @@ class JSONContainer(object):
             for l in iterable:
                 self.__set_empty_values(iterable=l, new_val=new_val)
 
-    def get_as_entity_labeled_dict(self):
-        new_dct = {str(self.entity_hook.entity).lower(): self.entity_hook.json_dict}
-        return new_dct
 
     def __load_json(self, path=None, fileio=None):
         if path is not None:
