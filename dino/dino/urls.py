@@ -22,6 +22,9 @@ from api import views #wird vielleicht als fehler angezeigt, ist aber richtig
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api/stocks/', views.StockList.as_view()),
+    url(r'^api/routes/', views.RoutesList.as_view()),
+    url(r'^api/routes/(?P<route_id>)/', views.RoutesListID.as_view()),
+    url(r'^api/users/', views.UserList.as_view())
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
