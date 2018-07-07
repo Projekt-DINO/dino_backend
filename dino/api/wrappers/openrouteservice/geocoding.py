@@ -1,4 +1,4 @@
-from dino.api.wrappers.openrouteservice.longlat import Waypoint
+from dino_backend.dino.api.wrappers.openrouteservice.longlat import Waypoint
 
 
 class GeocodeSearch(object):
@@ -8,14 +8,13 @@ class GeocodeSearch(object):
         self.country = "DEU"
         self.api_key = api_key
         self.parameters = {
-            "text": str(term),
+            "text": str(term) + ", Düsseldorf",  # adding Düsseldorf like this lets the API treat Düsseldorf as a locality to restrict the search to
         }
         if coords is not None:
             if not isinstance(coords, Waypoint):
                 raise ValueError("Coords must be instance of Waypoint, got {}".format(type(coords)))
             self.parameters["focus.point.lon"] = coords.longitude
             self.parameters["focus.point.lat"] = coords.latitude
-
 
     def build_url(self):
         url = "https://api.openrouteservice.org/geocode/search?api_key={}&size={}&boundary.country={}".format(self.api_key, self.result_size, self.country)

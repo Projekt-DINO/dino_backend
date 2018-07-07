@@ -2,25 +2,28 @@ import asyncio
 import aiohttp
 import json
 
-from dino.api.wrappers.openrouteservice.route import *
-from dino.api.wrappers.openrouteservice.geocoding import *
-from dino.api.wrappers.openrouteservice.pois import *
-from dino.api.wrappers.openrouteservice.config import APIConfig
-from dino.api.wrappers.openrouteservice.longlat import Waypoint
+from dino_backend.dino.api.wrappers.openrouteservice.route import *
+from dino_backend.dino.api.wrappers.openrouteservice.geocoding import *
+from dino_backend.dino.api.wrappers.openrouteservice.pois import *
+from dino_backend.dino.api.wrappers.openrouteservice.config import APIConfig
+from dino_backend.dino.api.wrappers.openrouteservice.longlat import Waypoint
 
 
 """
 Class with methods that make use of the APIs at https://openrouteservice.org/documentation/
 
 Requires an API-Key to be set in settings.cfg
+
+ORS = OpenRouteService
 """
 
 
-class OpenRouteServiceAPIWrapper(object):
+class ORSWrapper(object):
 
     def __init__(self):
         self.config = APIConfig()
-        self.async_loop = asyncio.get_event_loop()
+        self.async_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self.async_loop)
 
     """
     Binding to https://openrouteservice.org/documentation/#/reference/directions/directions/directions-service
@@ -106,9 +109,16 @@ class OpenRouteServiceAPIWrapper(object):
                 Languages.GREEK
                 Languages.BRAZILIAN_PORTUGUESE
     """
-    def get_route(self, waypoints, profile: str, preference: str, units: str, language: str):
-        if isinstance(waypoints, list):
-            waypoints = Waypoint.piped(waypoints)
+    def get_route(self, start_waypoint, end_waypoint, profile: str, preference: str, units: str, language: str, inter_waypoints=None):
+        if inter_waypoints is not None:
+            if not isinstance(inter_waypoints, list):
+                raise ValueError("Parameter intermediateWaypoints must be of type list, not {}".format(type(inter_waypoints)))
+            wps = [start_waypoint]
+            wps += inter_waypoints
+            wps.append(end_waypoint)
+            waypoints = Waypoint.piped(wps)
+        else:
+            waypoints = Waypoint.piped([start_waypoint, end_waypoint])
 
         dct = {
             "coordinates": waypoints,
@@ -120,25 +130,63 @@ class OpenRouteServiceAPIWrapper(object):
         
         direction = Route(api_key=self.config.api_key, **dct)
         url = direction.build_url()
-        response = self.async_loop.run_until_complete(self.__send_request(url))
+        response = self.async_loop.run_until_complete(self.__send_request(url, method="GET"))
             
         #print('\n'.join([','.join([str(coord) for coord in latlong]) for latlong in response["features"][0]["geometry"]["coordinates"]]))
         print(url)
         print(response)
         return response
 
-    def geocode_reverse_search(self, coords):
+    """
+    Binding to https://api.openrouteservice.org/geocode/reverse
+    
+    Returns a list of POIs, streets, etc. near a given Waypoint (a longlat coordinate).
+    
+    :coords: must be either a list or a Waypoint object
+    :return: JSON object (may return a JSON with an error code if something went wrong)
+    """
+    def geocode_reverse_search(self, coords, ensure_poi=True):
         g_search_reverse = GeocodeSearchReverse(api_key=self.config.api_key, coords=coords)
         url = g_search_reverse.build_url()
         response = self.async_loop.run_until_complete(self.__send_request(url, method="GET"))
+        if ensure_poi and "features" in response:
+            filtered_features = []
+            for feature in response["features"]:
+                if feature["properties"]["layer"] == "venue":  # venues usually refer to POIs from what I've seen
+                    filtered_features.append(feature)
+            response["features"] = filtered_features
+            if len(response["features"]) == 0:  # only do this check if we are modifying the features, the ORS API probably never returns something with 0 results by itself and instead throws an error or something
+                return {"Error": "No POIs were found on waypoint {}".format(str(coords))}
+            elif len(response["features"]) > 1:
+                response["features"] = [response["features"][0]]  # usually the first result has the highest confidence value, so return only that instead of a list
         print(url)
         print(response)
         return response
 
-    def geocode_search(self, term, coords=None):
+    """
+    Binding to https://api.openrouteservice.org/geocode/search
+    
+    Returns a list of POIs, streets, etc. whose names may be related to a search term.
+    
+    :term: The search term used to look for POIs (str)
+    :ensure_poi: Remove any results that is not a POI (i.e. streets will be removed if this is True)
+    :coords: (optional) longlat coordinates as a Waypoint object or a List, which helps to narrow down results to any result which is close to this coordinate
+    :return: JSON object (may return a JSON with an error code if something went wrong)
+    """
+    def geocode_search(self, term, ensure_poi=True, coords=None):
         g_search = GeocodeSearch(api_key=self.config.api_key, term=term, coords=coords)
         url = g_search.build_url()
         response = self.async_loop.run_until_complete(self.__send_request(url, method="GET"))
+        if ensure_poi and "features" in response:
+            filtered_features = []
+            for feature in response["features"]:
+                if feature["properties"]["layer"] == "venue":  # venues usually refer to POIs from what I've seen
+                    filtered_features.append(feature)
+            response["features"] = filtered_features
+            if len(response["features"]) == 0:  # only do this check if we are modifying the features, the ORS API probably never returns something with 0 results by itself and instead throws an error or something
+                return {"Error": "No POIs were found for search term {}".format(term)}
+            elif len(response["features"]) > 1:
+                response["features"] = [response["features"][0]]  # usually the first result has the highest confidence value, so return only that instead of a list
         print(url)
         print(response)
         return response
@@ -181,7 +229,7 @@ class APIError(Exception):
 
 
 if __name__ == "__main__":
-    api = OpenRouteServiceAPIWrapper()
+    api = ORSWrapper()
 
     """
     api.get_route(
@@ -200,4 +248,4 @@ if __name__ == "__main__":
     """
 
     # api.geocode_reverse_search([6.761680,51.217942])
-    api.geocode_search("Rheinturm", [6.761680,51.217942])
+    api.geocode_search("Rheinturm", [6.761680, 51.217942])

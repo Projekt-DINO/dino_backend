@@ -1,6 +1,7 @@
 import boto3
-from dino.database.dynamoDB.generateID import ID
-from dino.database.dynamoDB.globals import globals
+"""
+from dino_backend.dino.database.dynamoDB.generateID import ID
+from dino_backend.dino.database.dynamoDB.globals import globals
 import json
 
 dynamodb = boto3.resource('dynamodb',
@@ -49,4 +50,4 @@ def putIntoDINOUsers():
         print("Added user into table - successful")
     else:
         print("Failed to insert user into table")
-
+"""

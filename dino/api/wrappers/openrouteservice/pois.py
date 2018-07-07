@@ -1,4 +1,9 @@
-# This entire file is not used
+"""
+
+This entire file is not used.
+
+
+"""
 
 
 class PointOfInterest(object):

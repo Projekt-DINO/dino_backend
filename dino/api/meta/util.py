@@ -15,3 +15,10 @@ def upperfirst(string: str):
 
 def isempty(string: str):
     return string is None or string == "" or len(string) == 0
+
+
+def list_type_of(l: list, t):
+    for obj in l:
+        if not isinstance(obj, t):
+            return False
+    return True
