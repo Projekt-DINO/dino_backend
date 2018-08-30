@@ -6,7 +6,7 @@ from rest_framework import status
 from .models import Stock
 from .serializers import StockSerializer
 #from dino.database.dynamoDB.get_table_content import getRoutesTable
-from database.dynamoDB.get_table_content import getRoutes, getUsers, getRouteByID
+from database.dynamoDB.get_table_content import getRoutes, getUsers, getRouteByID, getUserByID, getRoutesByName
 #from database.dynamoDB.globals import globals
 
 
@@ -24,15 +24,21 @@ class StockList(APIView):
 
 class RoutesList(APIView):
     def get(self, request):
-
         route_infos = getRoutes()
 
         return Response(route_infos)
 
 class RoutesListID(APIView):
-    # funktioniert noch nicht. Er geht durch die URL noch nicht in diesen Fall.
-    def get(self, **kwargs):
-        route_infos = getRouteByID(id = kwargs['route_id'])
+    def get(self, request, route_id):
+
+        route_infos = getRouteByID(id = self.kwargs['route_id'])
+
+        return Response(route_infos)
+
+class RoutesListName(APIView):
+    def get(self, request, route_name):
+
+        route_infos = getRoutesByName(name = self.kwargs['route_name'])
 
         return Response(route_infos)
 
@@ -41,3 +47,10 @@ class UserList(APIView):
         users = getUsers()
 
         return Response(users)
+
+class UserListID(APIView):
+    def get(self, request, user_id):
+
+        user_infos = getUserByID(id = self.kwargs['user_id'])
+
+        return Response(user_infos)

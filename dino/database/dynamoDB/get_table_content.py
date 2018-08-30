@@ -1,4 +1,5 @@
 import boto3
+from ast import literal_eval
 from database.dynamoDB.globals import globals
 from boto3.dynamodb.conditions import Key, Attr
 
@@ -33,13 +34,28 @@ def getRoutes():
     return routes
 
 def getRouteByID(id):
-    #funktioniert noch nicht. Er geht durch die URL noch nicht in diesen Fall.
     table = dynamodb.Table('Routes')
     route_raw = table.query(KeyConditionExpression=Key('routeID').eq(id))
 
-    route = reformat(route_raw, "routes")
+    #route = reformat(route_raw, "routes")
 
-    return route
+    return route_raw
+
+def getRoutesByName(name):
+    table = dynamodb.Table('Routes')
+    route_raw = table.scan(KeyConditionExpression=Key('name').contains(name))
+
+    routes = reformat(route_raw, "routes")
+
+    return routes
+
+def getUserByID(id):
+    table = dynamodb.Table('DINO_Users')
+    user_raw = table.query(KeyConditionExpression=Key('userID').eq(id))
+
+    user = reformat(user_raw, "users")
+
+    return user
 
 def getUsers():
     """
@@ -64,6 +80,8 @@ def reformat(data, table):
 
     if table == "routes":
         return {element['routeID']: element['route'] for element in data['Items']}
+        #return { (element['routeID']):(literal_eval(element['route']) if isinstance(element['route'], str)
+          #else element['route']) for element in data['Items'] }
     elif table == "users":
         return {element['userID']: element for element in data['Items']}
     else:
